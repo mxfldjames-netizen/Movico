@@ -17,7 +17,7 @@ const videoData = [
   },
   {
     id: 2,
-    title: "Tech Animation",
+    title: "Tech Animation", 
     thumbnail:
       "https://images-na.ssl-images-amazon.com/images/I/31GjEJUp2EL.jpg",
     video: "https://www.youtube.com/embed/jNQXAC9IVRw",
