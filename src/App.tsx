@@ -70,6 +70,14 @@ const videoData = [
     video: "https://www.youtube.com/embed/fJ9rUzIMcZQ",
     orientation: "vertical",
   },
+  {
+    id: 9,
+    title: "Dragon Ball",
+    thumbnail:
+      "https://www.xtrafondos.com/wallpapers/vertical/goku-3991.jpg",
+    video: "https://www.youtube.com/embed/fJ9rUzIMcZQ",
+    orientation: "vertical",
+  },
 ];
 
 function App() {
