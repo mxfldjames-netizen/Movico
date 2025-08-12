@@ -23,7 +23,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     {
       name: "Kitty",
       role: "AI Engineer",
-      image: "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400",
+      image: "https://freeimage.host/i/FZuO8cQ",
       description: "Machine learning expert focused on video generation algorithms."
     }
   ];
