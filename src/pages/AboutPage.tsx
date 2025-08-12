@@ -102,9 +102,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
                 human creativity—they amplify it.
               </p>
               <p>
-                Today, we're proud to serve clients ranging from startups to Fortune 500 
-                companies, helping them bring their stories to life with unprecedented 
-                speed and quality.
+             
               </p>
             </div>
           </div>
