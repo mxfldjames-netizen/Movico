@@ -10,21 +10,21 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
   const teamMembers = [
     {
       name: "Akhil Nair",
-      role: "Founder and Creative Director",
+      role: "Founder,Creative Director,Editor",
       image: "https://media.licdn.com/dms/image/v2/D5603AQFQkWqxJBFuHw/profile-displayphoto-shrink_800_800/B56ZeeO21GH8Ag-/0/1750706385032?e=1758153600&v=beta&t=hnp-l1fOx4XGv5UVboSiEEMcYyEIo9_CqDw9mDfFefA",
-      description: "Leading AI innovation in creative storytelling with 10+ years in tech."
+      description: "Creative storytelling with 6+ years in Creative Content Creation."
     },
     {
       name: "Aman Dangi",
-      role: "Manager ",
+      role: "CMO,Creative Strategist  ",
       image: "https://iili.io/FZugXgs.md.png",
-      description: "Award-winning producer specializing in AI-generated content creation."
+      description: "Entreprenur"
     },
     {
       name: "Kitty",
       role: "AI Engineer",
       image: "https://iili.io/FZuO8cQ.jpg",
-      description: "Machine learning expert focused on video generation algorithms."
+      description: "Our powerful AI automation tool"
     }
   ];
 
