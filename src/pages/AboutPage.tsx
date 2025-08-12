@@ -11,7 +11,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
     {
       name: "Akhil Nair",
       role: "Founder and Creative Director",
-      image: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400",
+      image: "https://media.licdn.com/dms/image/v2/D5603AQFQkWqxJBFuHw/profile-displayphoto-shrink_800_800/B56ZeeO21GH8Ag-/0/1750706385032?e=1758153600&v=beta&t=hnp-l1fOx4XGv5UVboSiEEMcYyEIo9_CqDw9mDfFefA",
       description: "Leading AI innovation in creative storytelling with 10+ years in tech."
     },
     {
