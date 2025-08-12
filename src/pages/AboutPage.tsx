@@ -9,20 +9,20 @@ interface AboutPageProps {
 const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
   const teamMembers = [
     {
-      name: "Alex Chen",
-      role: "AI Director & Founder",
+      name: "Akhil Nair",
+      role: "Founder and Creative Director",
       image: "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=400",
       description: "Leading AI innovation in creative storytelling with 10+ years in tech."
     },
     {
-      name: "Sarah Martinez",
-      role: "Creative Producer",
+      name: "Aman Dangi",
+      role: "Manager ",
       image: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400",
       description: "Award-winning producer specializing in AI-generated content creation."
     },
     {
-      name: "David Kim",
-      role: "Technical Lead",
+      name: "Kitty",
+      role: "AI Engineer",
       image: "https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=400",
       description: "Machine learning expert focused on video generation algorithms."
     }
