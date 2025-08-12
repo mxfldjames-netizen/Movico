@@ -18,7 +18,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
       name: "Aman Dangi",
       role: "CMO,Creative Strategist  ",
       image: "https://iili.io/FZugXgs.md.png",
-      description: "Entreprenur"
+      description: "Entreprenur, Revolving around Graphics, Blockchain and Commerce"
     },
     {
       name: "Kitty",
