@@ -62,11 +62,11 @@ const VideoCard: React.FC<VideoCardProps> = ({
 
   // For Carousel (horizontal scroll)
   return (
-    <div className="relative flex-shrink-0 h-36 sm:h-40 lg:h-44">
+    <div className="relative flex-shrink-0 h-36 sm:h-40 lg:h-44 p-2">
       <div
         className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 h-full group ${
           isVertical ? "w-24 sm:w-28 lg:w-32" : "w-48 sm:w-56 lg:w-64"
-        } hover:scale-105 hover:shadow-2xl`}
+        } hover:scale-110 hover:shadow-2xl hover:z-10`}
         onClick={handlePlayClick}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-10" />

@@ -97,7 +97,7 @@ const VideoCarousel: React.FC<VideoCarouselProps> = ({ videoData, onVideoPlay })
       {/* Video Container */}
       <div
         ref={scrollRef}
-        className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide"
+        className="flex gap-1 sm:gap-2 overflow-x-auto pb-4 scrollbar-hide"
         style={{
           scrollbarWidth: "none",
           msOverflowStyle: "none",
