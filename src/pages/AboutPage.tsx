@@ -93,10 +93,7 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
             <h2 className="text-2xl sm:text-3xl font-bold text-black">Our Story</h2>
             <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>
-                Founded in 2024, Movico Studio emerged from a simple yet powerful vision: 
-                to revolutionize how stories are told in the digital age. We recognized that 
-                traditional video production was often expensive, time-consuming, and 
-                inaccessible to many creators with brilliant ideas.
+                Founded in 2025 with the launch of Google VEO3, Movico Studio emerged from a simple yet powerful vision: to revolutionize how stories are told in the digital age. We recognized that traditional video production was often expensive, time-consuming, and inaccessible to many creators with brilliant ideas.
               </p>
               <p>
                 By harnessing the power of artificial intelligence, we've created a platform 
