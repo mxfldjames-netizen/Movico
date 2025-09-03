@@ -2,6 +2,7 @@ import React from 'react';
 import { Sparkles, Zap, Award } from 'lucide-react';
 import AnimatedStatsCard from '../AnimatedStatsCard';
 import VideoCarousel from '../components/VideoCarousel';
+import ImageCarousel from '../components/ImageCarousel';
 import Footer from '../components/Footer';
 
 interface Video {
@@ -12,13 +13,28 @@ interface Video {
   orientation: string;
 }
 
+interface Image {
+  id: number;
+  title: string;
+  thumbnail: string;
+  orientation: string;
+}
+
 interface HomePageProps {
   videoData: Video[];
+  imageData: Image[];
   onVideoPlay: (video: Video) => void;
+  onImageView: (image: Image) => void;
   onStartCreating: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ videoData, onVideoPlay, onStartCreating }) => {
+const HomePage: React.FC<HomePageProps> = ({ 
+  videoData, 
+  imageData, 
+  onVideoPlay, 
+  onImageView, 
+  onStartCreating 
+}) => {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
       {/* Background Effects */}
@@ -55,9 +71,22 @@ const HomePage: React.FC<HomePageProps> = ({ videoData, onVideoPlay, onStartCrea
           </button>
         </div>
 
-        {/* Video Carousel */}
-        <div className="w-full max-w-5xl mb-16">
+        {/* Video Ads Carousel */}
+        <div className="w-full max-w-5xl mb-8">
+          <div className="text-center mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-2">Video Ads</h2>
+            <p className="text-gray-600 text-sm sm:text-base">AI-generated video advertisements</p>
+          </div>
           <VideoCarousel videoData={videoData} onVideoPlay={onVideoPlay} />
+        </div>
+
+        {/* Static Ads Carousel */}
+        <div className="w-full max-w-5xl mb-16">
+          <div className="text-center mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-2">Static Ads</h2>
+            <p className="text-gray-600 text-sm sm:text-base">AI-generated static advertisements</p>
+          </div>
+          <ImageCarousel imageData={imageData} onImageView={onImageView} />
         </div>
 
         {/* Stats Section - Animated Cards with Counters */}
