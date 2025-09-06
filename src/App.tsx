@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navigation from "./components/Navigation";
 import VideoModal from "./components/VideoModal";
-import ImageModal from "./components/ImageModal";
 import HomePage from "./pages/HomePage";
 import PortfolioPage from "./pages/PortfolioPage";
 import AboutPage from "./pages/AboutPage";
@@ -81,86 +80,21 @@ const videoData = [
   },
 ];
 
-const imageData = [
-  {
-    id: 1,
-    title: "Fashion Brand",
-    thumbnail: "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "vertical",
-  },
-  {
-    id: 2,
-    title: "Tech Product",
-    thumbnail: "https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "landscape",
-  },
-  {
-    id: 3,
-    title: "Food & Beverage",
-    thumbnail: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "vertical",
-  },
-  {
-    id: 4,
-    title: "Luxury Watch",
-    thumbnail: "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "landscape",
-  },
-  {
-    id: 5,
-    title: "Travel Agency",
-    thumbnail: "https://images.pexels.com/photos/1591373/pexels-photo-1591373.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "vertical",
-  },
-  {
-    id: 6,
-    title: "Fitness Brand",
-    thumbnail: "https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "landscape",
-  },
-  {
-    id: 7,
-    title: "Beauty Product",
-    thumbnail: "https://images.pexels.com/photos/3373736/pexels-photo-3373736.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "vertical",
-  },
-  {
-    id: 8,
-    title: "Real Estate",
-    thumbnail: "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800",
-    orientation: "landscape",
-  },
-];
-
 function App() {
   const [activeItem, setActiveItem] = useState("home");
   const [selectedVideo, setSelectedVideo] = useState<
     (typeof videoData)[0] | null
   >(null);
-  const [selectedImage, setSelectedImage] = useState<
-    (typeof imageData)[0] | null
-  >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   const handleVideoPlay = (video: (typeof videoData)[0]) => {
     setSelectedVideo(video);
     setIsModalOpen(true);
   };
 
-  const handleImageView = (image: (typeof imageData)[0]) => {
-    setSelectedImage(image);
-    setIsImageModalOpen(true);
-  };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedVideo(null);
-  };
-
-  const handleCloseImageModal = () => {
-    setIsImageModalOpen(false);
-    setSelectedImage(null);
   };
 
   const handleBackToHome = () => {
@@ -207,9 +141,7 @@ function App() {
       {activeItem === "home" && (
         <HomePage 
           videoData={videoData}
-          imageData={imageData}
           onVideoPlay={handleVideoPlay} 
-          onImageView={handleImageView}
           onStartCreating={handleStartCreating}
         />
       )}
@@ -232,13 +164,6 @@ function App() {
         video={selectedVideo}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-      />
-
-      {/* Image Modal */}
-      <ImageModal
-        image={selectedImage}
-        isOpen={isImageModalOpen}
-        onClose={handleCloseImageModal}
       />
     </div>
   );
