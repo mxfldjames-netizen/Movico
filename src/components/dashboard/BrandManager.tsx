@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Upload, Trash2, Edit, Save, X, Package } from 'lucide-react';
+import { Plus, Upload, Trash2, Edit, Save, X, Package, Image, FileText, Video } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,6 +48,7 @@ const BrandManager: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    logo_url: '',
     guidelines: '',
     industry: '',
     target_audience: '',
@@ -60,6 +61,10 @@ const BrandManager: React.FC = () => {
     target_audience: '',
     campaign_type: '',
   });
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -125,13 +130,22 @@ const BrandManager: React.FC = () => {
     e.preventDefault();
     if (!user) return;
 
+    setLoading(true);
     try {
+      let logoUrl = formData.logo_url;
+
+      // Upload logo if provided
+      if (logoFile) {
+        logoUrl = await uploadLogo(logoFile);
+      }
+
       const { data, error } = await supabase
         .from('brands')
         .insert({
           user_id: user.id,
           name: formData.name,
           description: formData.description || null,
+          logo_url: logoUrl || null,
           guidelines: formData.guidelines || null,
           industry: formData.industry || null,
           target_audience: formData.target_audience || null,
@@ -147,6 +161,8 @@ const BrandManager: React.FC = () => {
       resetForm();
     } catch (error) {
       console.error('Error creating brand:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,12 +170,21 @@ const BrandManager: React.FC = () => {
     e.preventDefault();
     if (!editingBrand) return;
 
+    setLoading(true);
     try {
+      let logoUrl = formData.logo_url;
+
+      // Upload new logo if provided
+      if (logoFile) {
+        logoUrl = await uploadLogo(logoFile);
+      }
+
       const { data, error } = await supabase
         .from('brands')
         .update({
           name: formData.name,
           description: formData.description || null,
+          logo_url: logoUrl || null,
           guidelines: formData.guidelines || null,
           industry: formData.industry || null,
           target_audience: formData.target_audience || null,
@@ -179,6 +204,8 @@ const BrandManager: React.FC = () => {
       resetForm();
     } catch (error) {
       console.error('Error updating brand:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -201,6 +228,38 @@ const BrandManager: React.FC = () => {
       }
     } catch (error) {
       console.error('Error deleting brand:', error);
+    }
+  };
+
+  const uploadLogo = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `logo-${uuidv4()}.${fileExt}`;
+    const filePath = `brand-logos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('brand-assets')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('brand-assets')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setLogoFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -277,11 +336,14 @@ const BrandManager: React.FC = () => {
     setFormData({
       name: '',
       description: '',
+      logo_url: '',
       guidelines: '',
       industry: '',
       target_audience: '',
       brand_colors: [''],
     });
+    setLogoFile(null);
+    setLogoPreview('');
   };
 
   const startEditing = (brand: Brand) => {
@@ -289,11 +351,13 @@ const BrandManager: React.FC = () => {
     setFormData({
       name: brand.name,
       description: brand.description || '',
+      logo_url: brand.logo_url || '',
       guidelines: brand.guidelines || '',
       industry: brand.industry || '',
       target_audience: brand.target_audience || '',
       brand_colors: brand.brand_colors || [''],
     });
+    setLogoPreview(brand.logo_url || '');
   };
 
   if (loading) {
@@ -340,7 +404,22 @@ const BrandManager: React.FC = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-medium text-gray-900">{brand.name}</h3>
+                        <div className="flex items-center gap-3">
+                          {brand.logo_url ? (
+                            <img 
+                              src={brand.logo_url} 
+                              alt={`${brand.name} logo`}
+                              className="w-8 h-8 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
+                              <Package className="w-4 h-4 text-gray-400" />
+                            </div>
+                          )}
+                          <div>
+                            <h3 className="font-medium text-gray-900">{brand.name}</h3>
+                          </div>
+                        </div>
                         {brand.industry && (
                           <p className="text-sm text-gray-500">{brand.industry}</p>
                         )}
@@ -379,27 +458,54 @@ const BrandManager: React.FC = () => {
             <div className="space-y-6">
               {/* Brand Info */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">{selectedBrand.name}</h2>
+                <div className="flex items-center gap-4 mb-4">
+                  {selectedBrand.logo_url ? (
+                    <img 
+                      src={selectedBrand.logo_url} 
+                      alt={`${selectedBrand.name} logo`}
+                      className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                      <Package className="w-8 h-8 text-gray-400" />
+                    </div>
+                  )}
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">{selectedBrand.name}</h2>
+                    {selectedBrand.industry && (
+                      <p className="text-gray-500">{selectedBrand.industry}</p>
+                    )}
+                  </div>
+                </div>
                 {selectedBrand.description && (
                   <p className="text-gray-600 mb-4">{selectedBrand.description}</p>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedBrand.industry && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Industry</label>
-                      <p className="text-gray-900">{selectedBrand.industry}</p>
-                    </div>
-                  )}
                   {selectedBrand.target_audience && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
                       <p className="text-gray-900">{selectedBrand.target_audience}</p>
                     </div>
                   )}
+                  {selectedBrand.brand_colors && selectedBrand.brand_colors.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Brand Colors</label>
+                      <div className="flex gap-2">
+                        {selectedBrand.brand_colors.map((color, index) => (
+                          <div
+                            key={index}
+                            className="w-8 h-8 rounded border border-gray-300"
+                            style={{ backgroundColor: color }}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {selectedBrand.guidelines && (
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Brand Guidelines</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Brand Guidelines & Creative Direction</label>
                     <p className="text-gray-900 whitespace-pre-wrap">{selectedBrand.guidelines}</p>
                   </div>
                 )}
@@ -408,36 +514,62 @@ const BrandManager: React.FC = () => {
               {/* Brand Assets */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Brand Assets</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Brand Assets & Files</h3>
                   <label className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 cursor-pointer">
                     <Upload className="w-4 h-4" />
-                    Upload Asset
+                    Upload Files
                     <input
                       type="file"
                       onChange={handleFileUpload}
                       className="hidden"
-                      accept="image/*,video/*,.pdf,.doc,.docx"
+                      accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                      multiple
                     />
                   </label>
                 </div>
+                <p className="text-sm text-gray-500 mb-4">
+                  Upload images, videos, documents, or any other files that represent your brand or will help in creating ads.
+                </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {brandAssets.map((asset) => (
                     <div key={asset.id} className="border border-gray-200 rounded-lg p-3">
                       {asset.file_type.startsWith('image/') ? (
-                        <img
-                          src={asset.file_url}
-                          alt={asset.file_name}
-                          className="w-full h-24 object-cover rounded mb-2"
-                        />
+                        <div className="relative">
+                          <img
+                            src={asset.file_url}
+                            alt={asset.file_name}
+                            className="w-full h-24 object-cover rounded mb-2"
+                          />
+                          <div className="absolute top-1 right-1 bg-black/50 rounded p-1">
+                            <Image className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
+                      ) : asset.file_type.startsWith('video/') ? (
+                        <div className="relative w-full h-24 bg-gray-100 rounded mb-2 flex items-center justify-center">
+                          <Video className="w-6 h-6 text-gray-400" />
+                          <div className="absolute top-1 right-1 bg-black/50 rounded p-1">
+                            <Video className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
                       ) : (
-                        <div className="w-full h-24 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                          <Upload className="w-6 h-6 text-gray-400" />
+                        <div className="relative w-full h-24 bg-gray-100 rounded mb-2 flex items-center justify-center">
+                          <FileText className="w-6 h-6 text-gray-400" />
+                          <div className="absolute top-1 right-1 bg-black/50 rounded p-1">
+                            <FileText className="w-3 h-3 text-white" />
+                          </div>
                         </div>
                       )}
                       <p className="text-sm text-gray-900 truncate">{asset.file_name}</p>
                       <p className="text-xs text-gray-500">{(asset.file_size / 1024).toFixed(1)} KB</p>
                     </div>
                   ))}
+                  {brandAssets.length === 0 && (
+                    <div className="col-span-full text-center py-8 text-gray-500">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                      <p>No brand assets uploaded yet</p>
+                      <p className="text-xs">Upload images, videos, or documents to get started</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -567,6 +699,45 @@ const BrandManager: React.FC = () => {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Brand Logo</label>
+                  <div className="flex items-center gap-4">
+                    {(logoPreview || formData.logo_url) && (
+                      <div className="relative">
+                        <img 
+                          src={logoPreview || formData.logo_url} 
+                          alt="Logo preview"
+                          className="w-16 h-16 rounded-lg object-cover border border-gray-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLogoFile(null);
+                            setLogoPreview('');
+                            setFormData({ ...formData, logo_url: '' });
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                    <label className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg cursor-pointer transition-colors duration-200">
+                      <Upload className="w-4 h-4" />
+                      {logoPreview || formData.logo_url ? 'Change Logo' : 'Upload Logo'}
+                      <input
+                        type="file"
+                        onChange={handleLogoChange}
+                        className="hidden"
+                        accept="image/*"
+                      />
+                    </label>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Upload your brand logo (PNG, JPG, or SVG recommended)
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
@@ -590,14 +761,17 @@ const BrandManager: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Brand Guidelines</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Brand Guidelines & Creative Direction</label>
                   <textarea
                     value={formData.guidelines}
                     onChange={(e) => setFormData({ ...formData, guidelines: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                     rows={4}
-                    placeholder="Describe your brand's voice, tone, style guidelines..."
+                    placeholder="Describe your brand's voice, tone, style guidelines, creative direction, and any specific requirements that should be followed when creating ads..."
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Include details about brand personality, messaging style, visual preferences, do's and don'ts, target audience insights, and any other creative direction.
+                  </p>
                 </div>
 
                 <div>
@@ -641,10 +815,11 @@ const BrandManager: React.FC = () => {
                 <div className="flex items-center gap-3 pt-4">
                   <button
                     type="submit"
+                    disabled={loading}
                     className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
                   >
                     <Save className="w-4 h-4" />
-                    {editingBrand ? 'Update Brand' : 'Create Brand'}
+                    {loading ? 'Saving...' : (editingBrand ? 'Update Brand' : 'Create Brand')}
                   </button>
                   <button
                     type="button"
