@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Navigation from "./components/Navigation";
 import VideoModal from "./components/VideoModal";
 import ImageModal from "./components/ImageModal";
+import AuthModal from "./components/auth/AuthModal";
 import HomePage from "./pages/HomePage";
 import PortfolioPage from "./pages/PortfolioPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const videoData = [
   {
@@ -132,7 +135,7 @@ const imageData = [
   },
 ];
 
-function App() {
+function AppContent() {
   const [activeItem, setActiveItem] = useState("home");
   const [selectedVideo, setSelectedVideo] = useState<
     (typeof videoData)[0] | null
@@ -142,6 +145,10 @@ function App() {
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+
+  const { user, loading } = useAuth();
 
   const handleVideoPlay = (video: (typeof videoData)[0]) => {
     setSelectedVideo(video);
@@ -168,7 +175,22 @@ function App() {
   };
 
   const handleStartCreating = () => {
-    setActiveItem("contact");
+    if (user) {
+      setActiveItem("dashboard");
+    } else {
+      setAuthMode('signup');
+      setIsAuthModalOpen(true);
+    }
+  };
+
+  const handleLogin = () => {
+    setAuthMode('login');
+    setIsAuthModalOpen(true);
+  };
+
+  const handleSignup = () => {
+    setAuthMode('signup');
+    setIsAuthModalOpen(true);
   };
 
   useEffect(() => {
@@ -198,10 +220,24 @@ function App() {
     };
   }, []);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <Navigation activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Navigation 
+        activeItem={activeItem} 
+        setActiveItem={setActiveItem}
+        user={user}
+        onLogin={handleLogin}
+        onSignup={handleSignup}
+      />
 
       {/* Page Content */}
       {activeItem === "home" && (
@@ -226,6 +262,9 @@ function App() {
       {activeItem === "contact" && (
         <ContactPage onBack={handleBackToHome} />
       )}
+      {activeItem === "dashboard" && user && (
+        <DashboardPage />
+      )}
 
       {/* Video Modal */}
       <VideoModal
@@ -240,7 +279,22 @@ function App() {
         isOpen={isImageModalOpen}
         onClose={handleCloseImageModal}
       />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
+      />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

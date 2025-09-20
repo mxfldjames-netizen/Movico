@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { User as UserIcon, LogIn, UserPlus } from 'lucide-react';
+import { User } from '@supabase/supabase-js';
 
 interface NavigationProps {
   activeItem: string;
   setActiveItem: (item: string) => void;
+  user: User | null;
+  onLogin: () => void;
+  onSignup: () => void;
 }
 
-const Navigation: React.FC<NavigationProps> = ({ activeItem, setActiveItem }) => {
+const Navigation: React.FC<NavigationProps> = ({ 
+  activeItem, 
+  setActiveItem, 
+  user, 
+  onLogin, 
+  onSignup 
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -17,12 +28,21 @@ const Navigation: React.FC<NavigationProps> = ({ activeItem, setActiveItem }) =>
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = [
+  const publicNavItems = [
     { id: "home", label: "Home Page" },
     { id: "portfolio", label: "Portfolio" },
     { id: "about", label: "About Us" },
     { id: "contact", label: "Contact Us" },
   ];
+
+  const userNavItems = [
+    { id: "home", label: "Home Page" },
+    { id: "portfolio", label: "Portfolio" },
+    { id: "dashboard", label: "Dashboard" },
+    { id: "about", label: "About Us" },
+  ];
+
+  const navItems = user ? userNavItems : publicNavItems;
 
   return (
     <nav 
@@ -40,26 +60,56 @@ const Navigation: React.FC<NavigationProps> = ({ activeItem, setActiveItem }) =>
           </div>
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            {navItems.map((item) => (
+            <div className="flex items-center space-x-6 lg:space-x-8">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveItem(item.id)}
+                  className={`relative px-3 py-2 text-base lg:text-lg font-medium transition-all duration-300 overflow-hidden ${
+                    activeItem === item.id
+                      ? "text-black"
+                      : "text-gray-600 hover:text-black"
+                  }`}
+                >
+                  <span className="relative z-10">{item.label}</span>
+                  {activeItem === item.id && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-black via-gray-700 to-gray-500 rounded-full" />
+                  )}
+                  <div 
+                    className={`absolute inset-0 bg-gray-100 rounded-lg transform scale-x-0 transition-transform duration-300 origin-left ${activeItem === item.id ? 'opacity-10' : 'opacity-0 group-hover:opacity-5'}`}
+                    style={{ transform: activeItem === item.id ? 'scaleX(1)' : 'scaleX(0)' }}
+                  />
+                </button>
+              ))}
+            </div>
+            
+            {/* Auth Buttons */}
+            {user ? (
               <button
-                key={item.id}
-                onClick={() => setActiveItem(item.id)}
-                className={`relative px-3 py-2 text-base lg:text-lg font-medium transition-all duration-300 overflow-hidden ${
-                  activeItem === item.id
-                    ? "text-black"
-                    : "text-gray-600 hover:text-black"
-                }`}
+                onClick={() => setActiveItem('dashboard')}
+                className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
               >
-                <span className="relative z-10">{item.label}</span>
-                {activeItem === item.id && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-black via-gray-700 to-gray-500 rounded-full" />
-                )}
-                <div 
-                  className={`absolute inset-0 bg-gray-100 rounded-lg transform scale-x-0 transition-transform duration-300 origin-left ${activeItem === item.id ? 'opacity-10' : 'opacity-0 group-hover:opacity-5'}`}
-                  style={{ transform: activeItem === item.id ? 'scaleX(1)' : 'scaleX(0)' }}
-                />
+                <UserIcon className="w-4 h-4" />
+                Dashboard
               </button>
-            ))}
+            ) : (
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={onLogin}
+                  className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors duration-200"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </button>
+                <button
+                  onClick={onSignup}
+                  className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Sign Up
+                </button>
+              </div>
+            )}
           </div>
           {/* Mobile Menu Button */}
           <div className="md:hidden">
@@ -112,6 +162,32 @@ const Navigation: React.FC<NavigationProps> = ({ activeItem, setActiveItem }) =>
                 {item.label}
               </button>
             ))}
+            
+            {/* Mobile Auth Buttons */}
+            {!user && (
+              <div className="pt-4 border-t border-gray-200 space-y-2">
+                <button
+                  onClick={() => {
+                    onLogin();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-md transition-colors duration-200"
+                >
+                  <LogIn className="w-4 h-4" />
+                  Login
+                </button>
+                <button
+                  onClick={() => {
+                    onSignup();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors duration-200"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Sign Up
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
